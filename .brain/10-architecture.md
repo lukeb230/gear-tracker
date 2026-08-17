@@ -11,6 +11,8 @@ src/
     StatsBar.tsx      counts row (total / in shop / out / maintenance)
     AddGearForm.tsx   name + category form → store.addGear
     GearList.tsx      list + per-item actions (check out / return / maint / delete)
+                      + maintenance-notes input (shown only while in maintenance,
+                      saves on blur via store.setNotes)
     HistoryLog.tsx    last 20 activity entries
   App.tsx             composition + actor (your name) persistence
   main.tsx            mount + body styling

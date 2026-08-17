@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { removeGear, setStatus } from "../lib/store";
+import { removeGear, setNotes, setStatus } from "../lib/store";
 import { statusColor, statusLabel, timeAgo } from "../lib/format";
 import type { GearItem } from "../types";
 
@@ -21,13 +21,11 @@ export function GearList({ items, actor }: { items: GearItem[]; actor: string })
         <li
           key={g.id}
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
             padding: "12px 8px",
             borderBottom: "1px solid #1a2233",
           }}
         >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span
             style={{
               width: 10,
@@ -99,9 +97,38 @@ export function GearList({ items, actor }: { items: GearItem[]; actor: string })
               </button>
             </>
           )}
+          </div>
+          {g.status === "maintenance" && <MaintenanceNotes item={g} />}
         </li>
       ))}
     </ul>
+  );
+}
+
+function MaintenanceNotes({ item }: { item: GearItem }) {
+  const [draft, setDraft] = useState(item.notes);
+  return (
+    <input
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => {
+        if (draft !== item.notes) setNotes(item.id, draft);
+      }}
+      placeholder="Maintenance notes — what needs fixing?"
+      style={{
+        display: "block",
+        boxSizing: "border-box",
+        width: "calc(100% - 22px)",
+        marginTop: 8,
+        marginLeft: 22,
+        padding: "6px 10px",
+        borderRadius: 6,
+        border: "1px solid #232d42",
+        background: "#111827",
+        color: "#e2e8f0",
+        fontSize: 12,
+      }}
+    />
   );
 }
 

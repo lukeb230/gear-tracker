@@ -93,6 +93,13 @@ export function setStatus(
   }
 }
 
+export function setNotes(id: string, notes: string) {
+  const items = getGear().map((g) =>
+    g.id === id ? { ...g, notes, updatedAt: new Date().toISOString() } : g,
+  );
+  write(GEAR_KEY, items);
+}
+
 export function removeGear(id: string, actor: string) {
   const item = getGear().find((g) => g.id === id);
   write(
