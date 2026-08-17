@@ -6,7 +6,7 @@ export interface GearItem {
   category: string;
   status: GearStatus;
   holder: string | null; // who has it checked out
-  notes: string;
+  notes: string; // maintenance notes — editable/visible only while in maintenance
   updatedAt: string; // ISO
 }
 
