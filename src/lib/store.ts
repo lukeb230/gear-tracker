@@ -27,17 +27,30 @@ function read<T>(key: string, fallback: T): T {
   }
 }
 
+// Snapshots must be referentially stable between writes — useSyncExternalStore
+// compares them by identity, so re-parsing on every call causes a render loop.
+let gearCache: GearItem[] | null = null;
+let historyCache: HistoryEntry[] | null = null;
+
 function write<T>(key: string, value: T) {
   localStorage.setItem(key, JSON.stringify(value));
+  gearCache = null;
+  historyCache = null;
   emit();
 }
 
 export function getGear(): GearItem[] {
-  return read<GearItem[]>(GEAR_KEY, []);
+  if (gearCache === null) {
+    gearCache = read<GearItem[]>(GEAR_KEY, []);
+  }
+  return gearCache;
 }
 
 export function getHistory(): HistoryEntry[] {
-  return read<HistoryEntry[]>(HISTORY_KEY, []);
+  if (historyCache === null) {
+    historyCache = read<HistoryEntry[]>(HISTORY_KEY, []);
+  }
+  return historyCache;
 }
 
 function logHistory(entry: Omit<HistoryEntry, "id" | "at">) {
