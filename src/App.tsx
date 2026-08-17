@@ -1,55 +1,107 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
-import { AddGearForm } from "./components/AddGearForm";
-import { GearList } from "./components/GearList";
-import { HistoryLog } from "./components/HistoryLog";
+import { useMemo, useState, useSyncExternalStore } from "react";
+import { FilterBar } from "./components/FilterBar";
+import { GearCard } from "./components/GearCard";
+import { GearForm } from "./components/GearForm";
+import { Header } from "./components/Header";
 import { StatsBar } from "./components/StatsBar";
-import { getGear, getHistory, subscribe } from "./lib/store";
+import { addSampleGear, getGear, subscribe } from "./lib/store";
+import { useTheme } from "./theme";
+import type { GearItem } from "./types";
 
 export default function App() {
   const items = useSyncExternalStore(subscribe, getGear);
-  const history = useSyncExternalStore(subscribe, getHistory);
-  const [actor, setActor] = useState(
-    () => localStorage.getItem("gear-tracker:actor") ?? "",
+  const [theme, toggleTheme] = useTheme();
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<string | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<GearItem | null>(null);
+
+  const categories = useMemo(
+    () => [...new Set(items.map((g) => g.category))],
+    [items],
   );
 
-  useEffect(() => {
-    localStorage.setItem("gear-tracker:actor", actor);
-  }, [actor]);
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return items.filter(
+      (g) =>
+        (!category || g.category === category) &&
+        (!q ||
+          `${g.name} ${g.brand} ${g.category} ${g.notes}`
+            .toLowerCase()
+            .includes(q)),
+    );
+  }, [items, query, category]);
+
+  function openAdd() {
+    setEditing(null);
+    setFormOpen(true);
+  }
+
+  function openEdit(item: GearItem) {
+    setEditing(item);
+    setFormOpen(true);
+  }
+
+  function closeForm() {
+    setFormOpen(false);
+    setEditing(null);
+  }
 
   return (
-    <main
-      style={{
-        maxWidth: 720,
-        margin: "0 auto",
-        padding: "32px 16px",
-        fontFamily: "system-ui, sans-serif",
-      }}
-    >
-      <header style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
-        <h1 style={{ margin: 0 }}>Gear Tracker</h1>
-        <span style={{ opacity: 0.5, fontSize: 13 }}>
-          the world's most disposable inventory app
-        </span>
-        <input
-          value={actor}
-          onChange={(e) => setActor(e.target.value)}
-          placeholder="Your name"
-          style={{
-            marginLeft: "auto",
-            padding: "6px 10px",
-            borderRadius: 6,
-            border: "1px solid #232d42",
-            background: "#111827",
-            color: "#e2e8f0",
-            width: 120,
-          }}
-        />
-      </header>
-
+    <main className="app">
+      <Header theme={theme} onToggleTheme={toggleTheme} />
       <StatsBar items={items} />
-      <AddGearForm actor={actor || "someone"} />
-      <GearList items={items} actor={actor || "someone"} />
-      <HistoryLog entries={history} />
+      <FilterBar
+        query={query}
+        onQuery={setQuery}
+        category={category}
+        onCategory={setCategory}
+        categories={categories}
+        onAdd={openAdd}
+      />
+
+      {formOpen && (
+        <GearForm key={editing?.id ?? "new"} initial={editing} onClose={closeForm} />
+      )}
+
+      {items.length === 0 && !formOpen ? (
+        <div className="empty">
+          <h2>The locker is empty</h2>
+          <p>Add your first piece of gear, or load a sample kit to look around.</p>
+          <div className="actions">
+            <button type="button" className="btn btn-primary" onClick={openAdd}>
+              + Add gear
+            </button>
+            <button type="button" className="btn" onClick={addSampleGear}>
+              Load sample kit
+            </button>
+          </div>
+        </div>
+      ) : visible.length === 0 && items.length > 0 ? (
+        <div className="empty">
+          <h2>No matches</h2>
+          <p>Nothing fits that search or filter. Clear it to see all gear.</p>
+          <div className="actions">
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                setQuery("");
+                setCategory(null);
+              }}
+            >
+              Clear filters
+            </button>
+          </div>
+        </div>
+      ) : (
+        <section className="grid" aria-label="Gear inventory">
+          {visible.map((g) => (
+            <GearCard key={g.id} item={g} onEdit={openEdit} />
+          ))}
+        </section>
+      )}
     </main>
   );
 }

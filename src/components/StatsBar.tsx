@@ -1,32 +1,27 @@
+import { totalWeightGrams } from "../lib/format";
 import type { GearItem } from "../types";
 
 export function StatsBar({ items }: { items: GearItem[] }) {
-  const total = items.length;
-  const out = items.filter((g) => g.status === "checked-out").length;
-  const maint = items.filter((g) => g.status === "maintenance").length;
-  const inShop = total - out - maint;
-
-  const stat = (label: string, value: number) => (
-    <div style={{ textAlign: "center" }}>
-      <div style={{ fontSize: 28, fontWeight: 700 }}>{value}</div>
-      <div style={{ fontSize: 12, opacity: 0.6 }}>{label}</div>
-    </div>
-  );
+  const totalG = totalWeightGrams(items);
+  const kg = totalG / 1000;
+  const categories = new Set(items.map((g) => g.category)).size;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: 32,
-        justifyContent: "center",
-        padding: "16px 0",
-        borderBottom: "1px solid #232d42",
-      }}
-    >
-      {stat("Total", total)}
-      {stat("In shop", inShop)}
-      {stat("Checked out", out)}
-      {stat("Maintenance", maint)}
+    <div className="stats">
+      <div className="stat">
+        <div className="value">{items.length}</div>
+        <div className="label">Items</div>
+      </div>
+      <div className="stat">
+        <div className="value">
+          {kg % 1 === 0 ? kg : kg.toFixed(2)} <em>kg</em>
+        </div>
+        <div className="label">Total weight</div>
+      </div>
+      <div className="stat">
+        <div className="value">{categories}</div>
+        <div className="label">Categories</div>
+      </div>
     </div>
   );
 }

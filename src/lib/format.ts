@@ -1,33 +1,32 @@
-import type { GearStatus } from "../types";
+import type { GearDims, GearItem } from "./../types";
 
-export function statusLabel(s: GearStatus): string {
-  switch (s) {
-    case "in-shop":
-      return "In shop";
-    case "checked-out":
-      return "Checked out";
-    case "maintenance":
-      return "Maintenance";
+export function formatWeight(grams: number | null): string {
+  if (grams == null) return "— g";
+  if (grams >= 1000) {
+    const kg = grams / 1000;
+    return `${kg % 1 === 0 ? kg : kg.toFixed(2)} kg`;
   }
+  return `${grams} g`;
 }
 
-export function statusColor(s: GearStatus): string {
-  switch (s) {
-    case "in-shop":
-      return "#2dd4bf";
-    case "checked-out":
-      return "#fbbf24";
-    case "maintenance":
-      return "#f87171";
-  }
+export function formatDims(dims: GearDims): string | null {
+  const parts = [dims.l, dims.w, dims.h];
+  if (parts.every((p) => p == null)) return null;
+  return `${parts.map((p) => p ?? "—").join(" × ")} cm`;
 }
 
-export function timeAgo(iso: string): string {
-  const ms = Date.now() - new Date(iso).getTime();
-  const min = Math.floor(ms / 60_000);
-  if (min < 1) return "just now";
-  if (min < 60) return `${min}m ago`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h ago`;
-  return `${Math.floor(hr / 24)}d ago`;
+export function formatPrice(usd: number | null): string | null {
+  if (usd == null) return null;
+  return `$${usd % 1 === 0 ? usd : usd.toFixed(2)}`;
+}
+
+export function totalWeightGrams(items: GearItem[]): number {
+  return items.reduce((sum, g) => sum + (g.weightGrams ?? 0), 0);
+}
+
+export function formatDate(yyyyMmDd: string): string | null {
+  if (!yyyyMmDd) return null;
+  const d = new Date(`${yyyyMmDd}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "short" });
 }
