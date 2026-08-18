@@ -1,0 +1,43 @@
+# Brain auto-refresh — the "never-ending function".
+# On every merged PR, Claude reads the diff and updates the affected .brain/
+# notes so the second brain never goes stale. Writes ONLY .brain/** files.
+#
+# Setup (one time): repo Settings → Secrets and variables → Actions →
+#   New repository secret: ANTHROPIC_API_KEY = <your Anthropic API key>
+# Optional: repository variable BRAIN_MODEL to override the default model.
+#
+# Without the secret the job exits quietly — safe to merge before the key exists.
+
+name: brain-refresh
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  refresh:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Refresh brain notes
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BRAIN_MODEL: ${{ vars.BRAIN_MODEL }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          REPO: ${{ github.repository }}
+        run: node .github/scripts/brain-refresh.mjs
