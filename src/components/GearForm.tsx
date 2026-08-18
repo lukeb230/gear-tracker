@@ -34,6 +34,9 @@ export function GearForm({
     initial?.condition ?? "good",
   );
   const [notes, setNotes] = useState(initial?.notes ?? "");
+  const [maintenanceNotes, setMaintenanceNotes] = useState(
+    initial?.maintenanceNotes ?? "",
+  );
   const [photo, setPhoto] = useState<string | null>(initial?.photo ?? null);
   const [photoError, setPhotoError] = useState(false);
 
@@ -61,6 +64,7 @@ export function GearForm({
       acquiredOn,
       condition,
       notes: notes.trim(),
+      maintenanceNotes: maintenanceNotes.trim(),
       photo,
     };
     if (initial) {
@@ -185,6 +189,17 @@ export function GearForm({
             ))}
           </select>
         </div>
+        {condition === "maintenance" && (
+          <div className="field span-2">
+            <label htmlFor="gear-maintenance-notes">Maintenance notes</label>
+            <input
+              id="gear-maintenance-notes"
+              value={maintenanceNotes}
+              onChange={(e) => setMaintenanceNotes(e.target.value)}
+              placeholder="What needs fixing?"
+            />
+          </div>
+        )}
         <div className="field span-2">
           <label htmlFor="gear-photo">Photo</label>
           <div className="photo-field">

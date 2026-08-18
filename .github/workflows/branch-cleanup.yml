@@ -1,0 +1,37 @@
+# Deletes head branches of merged PRs once they're older than 48 hours.
+# Runs inside the repo with the repo's own token — DevBrain never holds
+# write access; it only displays the "merged · auto-removes at 48h" status.
+name: Branch cleanup (48h after merge)
+
+on:
+  schedule:
+    - cron: "17 */6 * * *" # every 6 hours
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete merged branches older than 48h
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          cutoff=$(date -u -d "48 hours ago" +%s)
+          gh pr list --repo "$REPO" --state merged --limit 100 \
+            --json headRefName,mergedAt,headRepositoryOwner \
+            --jq '.[] | select(.headRepositoryOwner.login == "'"${REPO%%/*}"'") | [.headRefName, .mergedAt] | @tsv' |
+          while IFS=$'\t' read -r branch mergedAt; do
+            [ "$branch" = "main" ] && continue
+            merged_ts=$(date -u -d "$mergedAt" +%s)
+            if [ "$merged_ts" -lt "$cutoff" ]; then
+              echo "Deleting merged branch: $branch (merged $mergedAt)"
+              gh api -X DELETE "repos/$REPO/git/refs/heads/$branch" || echo "  (already gone)"
+            else
+              echo "Keeping $branch — inside 48h window"
+            fi
+          done

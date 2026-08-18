@@ -13,7 +13,9 @@ let items: GearItem[] = load();
 function load(): GearItem[] {
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as GearItem[]) : [];
+    const parsed = raw ? (JSON.parse(raw) as GearItem[]) : [];
+    // Items saved before the maintenance-notes merge lack the field.
+    return parsed.map((g) => ({ ...g, maintenanceNotes: g.maintenanceNotes ?? "" }));
   } catch {
     return [];
   }
@@ -53,6 +55,16 @@ export function updateGear(id: string, patch: Partial<GearDraft>) {
   );
 }
 
+export function setMaintenanceNotes(id: string, maintenanceNotes: string) {
+  commit(
+    items.map((g) =>
+      g.id === id
+        ? { ...g, maintenanceNotes, updatedAt: new Date().toISOString() }
+        : g,
+    ),
+  );
+}
+
 export function removeGear(id: string) {
   commit(items.filter((g) => g.id !== id));
 }
@@ -68,6 +80,7 @@ const SAMPLES: GearDraft[] = [
     acquiredOn: "2025-04-12",
     condition: "good",
     notes: "Packed size with stakes. Seam-sealed spring 2026.",
+    maintenanceNotes: "",
     photo: null,
   },
   {
@@ -78,8 +91,9 @@ const SAMPLES: GearDraft[] = [
     dims: { l: 79, w: 37, h: 30 },
     priceUsd: 260,
     acquiredOn: "2024-06-02",
-    condition: "worn",
+    condition: "maintenance",
     notes: "Hip belt pocket zipper sticks.",
+    maintenanceNotes: "Replace hip belt pocket zipper slider.",
     photo: null,
   },
   {
@@ -92,6 +106,7 @@ const SAMPLES: GearDraft[] = [
     acquiredOn: "2025-01-20",
     condition: "new",
     notes: "950fp down quilt, long/wide.",
+    maintenanceNotes: "",
     photo: null,
   },
   {
@@ -104,6 +119,7 @@ const SAMPLES: GearDraft[] = [
     acquiredOn: "2024-09-15",
     condition: "good",
     notes: "",
+    maintenanceNotes: "",
     photo: null,
   },
   {
@@ -116,6 +132,7 @@ const SAMPLES: GearDraft[] = [
     acquiredOn: "2023-05-30",
     condition: "good",
     notes: "Boils 500ml in ~100s. Fuel not included in weight.",
+    maintenanceNotes: "",
     photo: null,
   },
   {
@@ -128,6 +145,7 @@ const SAMPLES: GearDraft[] = [
     acquiredOn: "2023-05-30",
     condition: "worn",
     notes: "Backflush before every trip.",
+    maintenanceNotes: "",
     photo: null,
   },
   {
@@ -140,6 +158,7 @@ const SAMPLES: GearDraft[] = [
     acquiredOn: "2025-11-08",
     condition: "new",
     notes: "Weight with AAA batteries.",
+    maintenanceNotes: "",
     photo: null,
   },
   {
@@ -152,6 +171,7 @@ const SAMPLES: GearDraft[] = [
     acquiredOn: "2022-12-25",
     condition: "worn",
     notes: "Stuffs into its own pocket.",
+    maintenanceNotes: "",
     photo: null,
   },
 ];

@@ -1,4 +1,4 @@
-export type GearCondition = "new" | "good" | "worn" | "retired";
+export type GearCondition = "new" | "good" | "worn" | "maintenance" | "retired";
 
 export interface GearDims {
   l: number | null; // cm
@@ -17,6 +17,7 @@ export interface GearItem {
   acquiredOn: string; // yyyy-mm-dd, or ""
   condition: GearCondition;
   notes: string;
+  maintenanceNotes: string; // editable/visible only while condition is "maintenance"
   photo: string | null; // compressed data URL
   addedAt: string; // ISO
   updatedAt: string; // ISO
@@ -41,5 +42,6 @@ export const CONDITIONS: { value: GearCondition; label: string }[] = [
   { value: "new", label: "New" },
   { value: "good", label: "Good" },
   { value: "worn", label: "Worn" },
+  { value: "maintenance", label: "In maintenance" },
   { value: "retired", label: "Retired" },
 ];

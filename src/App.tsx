@@ -27,7 +27,7 @@ export default function App() {
       (g) =>
         (!category || g.category === category) &&
         (!q ||
-          `${g.name} ${g.brand} ${g.category} ${g.notes}`
+          `${g.name} ${g.brand} ${g.category} ${g.notes} ${g.maintenanceNotes}`
             .toLowerCase()
             .includes(q)),
     );

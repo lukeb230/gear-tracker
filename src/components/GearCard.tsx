@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { formatDate, formatDims, formatPrice, formatWeight } from "../lib/format";
-import { removeGear } from "../lib/store";
+import { removeGear, setMaintenanceNotes } from "../lib/store";
 import { CONDITIONS, type GearItem } from "../types";
 
 export function GearCard({
@@ -36,6 +36,7 @@ export function GearCard({
           <span className="cat">{item.category}</span>
         </div>
         {item.notes && <p className="card-notes">{item.notes}</p>}
+        {item.condition === "maintenance" && <MaintenanceNotes item={item} />}
       </div>
       <div className="spec">
         <span className="weight">{formatWeight(item.weightGrams)}</span>
@@ -75,5 +76,21 @@ export function GearCard({
         )}
       </div>
     </article>
+  );
+}
+
+function MaintenanceNotes({ item }: { item: GearItem }) {
+  const [draft, setDraft] = useState(item.maintenanceNotes);
+  return (
+    <input
+      className="maintenance-notes"
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => {
+        if (draft !== item.maintenanceNotes) setMaintenanceNotes(item.id, draft);
+      }}
+      placeholder="Maintenance notes — what needs fixing?"
+      aria-label={`Maintenance notes for ${item.name}`}
+    />
   );
 }
