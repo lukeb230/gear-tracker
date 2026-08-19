@@ -6,7 +6,7 @@ import { Header } from "./components/Header";
 import { StatsBar } from "./components/StatsBar";
 import { addSampleGear, getGear, subscribe } from "./lib/store";
 import { useTheme } from "./theme";
-import type { GearItem } from "./types";
+import { KNOWN_BRANDS, type GearItem } from "./types";
 
 export default function App() {
   const items = useSyncExternalStore(subscribe, getGear);
@@ -20,6 +20,19 @@ export default function App() {
     () => [...new Set(items.map((g) => g.category))],
     [items],
   );
+
+  const brandOptions = useMemo(() => {
+    const merged = new Map<string, string>(
+      KNOWN_BRANDS.map((b) => [b.toLowerCase(), b]),
+    );
+    for (const g of items) {
+      const brand = g.brand.trim();
+      if (brand && !merged.has(brand.toLowerCase())) {
+        merged.set(brand.toLowerCase(), brand);
+      }
+    }
+    return [...merged.values()].sort((a, b) => a.localeCompare(b));
+  }, [items]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -62,7 +75,12 @@ export default function App() {
       />
 
       {formOpen && (
-        <GearForm key={editing?.id ?? "new"} initial={editing} onClose={closeForm} />
+        <GearForm
+          key={editing?.id ?? "new"}
+          initial={editing}
+          brandOptions={brandOptions}
+          onClose={closeForm}
+        />
       )}
 
       {items.length === 0 && !formOpen ? (

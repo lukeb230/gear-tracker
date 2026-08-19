@@ -25,6 +25,34 @@ export interface GearItem {
 
 export type GearDraft = Omit<GearItem, "id" | "addedAt" | "updatedAt">;
 
+// Seed suggestions for the brand picker; the datalist in GearForm merges
+// these with brands already in the locker. Free-text brands remain valid.
+export const KNOWN_BRANDS = [
+  "Arc'teryx",
+  "Big Agnes",
+  "Black Diamond",
+  "Deuter",
+  "Enlightened Equipment",
+  "Garmin",
+  "Gregory",
+  "Hyperlite Mountain Gear",
+  "Jetboil",
+  "Katadyn",
+  "MSR",
+  "Nemo",
+  "Osprey",
+  "Outdoor Research",
+  "Patagonia",
+  "Petzl",
+  "Rab",
+  "REI Co-op",
+  "Salomon",
+  "Sawyer",
+  "Sea to Summit",
+  "Therm-a-Rest",
+  "Zpacks",
+] as const;
+
 export const CATEGORIES = [
   "Shelter",
   "Sleep",

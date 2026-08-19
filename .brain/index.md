@@ -7,6 +7,7 @@ and links to related notes with `[[wiki-links]]`. Start here.
 - [[architecture]] — file map and data flow after the inventory rework
 - [[theming]] — light/dark mode tokens and the theme toggle
 - [[maintenance-notes]] — the maintenance-notes feature and how it survived the rework
+- [[brand-picker]] — datalist-based brand combobox in the gear form
 - [[decisions]] — decision log, newest first
 - [[gotchas]] — known landmines
 

@@ -2,6 +2,10 @@
 
 Append new entries at the top: date · decision · why.
 
+- **2026-08-19 · Brand picker is a native datalist, not a select.** Brands
+  stay free-text (`GearItem.brand: string`, no migration); the form input
+  suggests `KNOWN_BRANDS` merged with brands already in the locker. A closed
+  `<select>` would have needed an "Other" escape hatch. See [[brand-picker]].
 - **2026-08-17 · Maintenance notes get their own field after the rework.**
   The merge of `light-dark-mode` with main split the fields: the rework uses
   `notes` as a real general-notes field, so the maintenance feature moved to
