@@ -16,9 +16,11 @@ function toNumber(raw: string): number | null {
 
 export function GearForm({
   initial,
+  brandOptions,
   onClose,
 }: {
   initial: GearItem | null;
+  brandOptions: string[];
   onClose: () => void;
 }) {
   const [name, setName] = useState(initial?.name ?? "");
@@ -94,10 +96,16 @@ export function GearForm({
           <label htmlFor="gear-brand">Brand</label>
           <input
             id="gear-brand"
+            list="gear-brand-options"
             value={brand}
             onChange={(e) => setBrand(e.target.value)}
-            placeholder="e.g. Nemo"
+            placeholder="Pick or type a brand"
           />
+          <datalist id="gear-brand-options">
+            {brandOptions.map((b) => (
+              <option key={b} value={b} />
+            ))}
+          </datalist>
         </div>
         <div className="field">
           <label htmlFor="gear-category">Category</label>

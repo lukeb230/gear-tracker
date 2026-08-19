@@ -19,8 +19,10 @@ src/
     FilterBar.tsx     search + category chips + add button
     GearCard.tsx      one item card; inline maintenance-notes input when
                       condition is "maintenance" (see [[maintenance-notes]])
-    GearForm.tsx      add/edit panel for the full GearDraft
-  App.tsx             composition, search/filter state, form open/edit state
+    GearForm.tsx      add/edit panel for the full GearDraft; brand field is
+                      a datalist combobox (see [[brand-picker]])
+  App.tsx             composition, search/filter state, form open/edit state,
+                      brandOptions for the brand picker
   main.tsx            mount
 ```
 
